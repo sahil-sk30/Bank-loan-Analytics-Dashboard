@@ -1,0 +1,60 @@
+﻿KPI 1: Financial Burden Analysis (Average DTI & Revolving Balance by Loan Status)
+
+
+SELECT 
+    loan_status, 
+    ROUND(AVG(dti), 2) AS Average_DTI, 
+    ROUND(AVG(revol_bal), 2) AS Average_Revolving_Balance
+FROM bank_analytics
+GROUP BY loan_status
+ORDER BY Average_DTI DESC;
+
+
+KPI 2: Profitability by Purpose (Total Interest Received by Loan Reason)
+
+
+SELECT 
+    purpose, 
+    ROUND(SUM(total_rec_int), 2) AS Total_Interest_Received
+FROM bank_analytics
+GROUP BY purpose
+ORDER BY Total_Interest_Received DESC
+LIMIT 10;
+
+
+KPI 3: Loan Term Performance & ROI
+
+
+SELECT 
+    term, 
+    ROUND(SUM(funded_amnt), 2) AS Total_Funded, 
+    ROUND(SUM(total_pymnt), 2) AS Total_Received,
+    ROUND((SUM(total_pymnt) / SUM(funded_amnt)) * 100, 2) AS ROI_Percentage
+FROM bank_analytics
+GROUP BY term;
+
+
+KPI 4: Risk Mitigation (Total Recoveries on Defaulted Loans by State)
+
+
+SELECT 
+    addr_state AS State, 
+    ROUND(SUM(recoveries), 2) AS Total_Recovered_Amount
+FROM bank_analytics
+WHERE loan_status = 'Charged Off'
+GROUP BY addr_state
+ORDER BY Total_Recovered_Amount DESC
+LIMIT 10;
+
+
+KPI 5: The Penalty Metric (Average Interest Rate by Delinquency History)
+
+
+SELECT 
+    delinq_2yrs AS Recent_Delinquencies, 
+    COUNT(*) AS Total_Borrowers,
+    ROUND(AVG(CAST(int_rate AS DECIMAL(10,4)) * 100), 2) AS Average_Interest_Rate_Percentage
+FROM bank_analytics
+WHERE delinq_2yrs IS NOT NULL AND delinq_2yrs != ''
+GROUP BY delinq_2yrs
+ORDER BY CAST(delinq_2yrs AS UNSIGNED) ASC;
